@@ -1,0 +1,26 @@
+# Deny by default inside every directory that holds real data, then whitelist
+# only the committed templates. An allow-list is the wrong shape here: it names
+# specific files, so any NEW kind of data file the tool starts writing lands
+# tracked by default. This way a new file is private unless someone says otherwise.
+
+config/*
+!config/*.example.md
+
+jobs/*
+!jobs/pipeline.example.csv
+
+work-search-log/*
+!work-search-log/activities.example.csv
+!work-search-log/weekly-claims.example.csv
+!work-search-log/filings/
+!work-search-log/claim-drafts/
+work-search-log/filings/*
+!work-search-log/filings/README.md
+work-search-log/claim-drafts/*
+!work-search-log/claim-drafts/README.md
+
+# Snapshots of real data.
+backups/
+
+# LibreOffice / Excel lock files.
+.~lock.*#

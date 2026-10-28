@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Refuse to commit anything that looks like a real person's job search.
+#
+# This repo is public. Everything real — criteria, target employers, pipeline,
+# work-search log, filing confirmations, backups — is gitignored. This hook is
+# the backstop for the case the ignore rules miss: someone teaches the tool to
+# write a new kind of file, the ignore rules haven't caught up, and it lands
+# tracked. That exact gap existed in this repo until 2026-10-28, when a test run
+# found config/sources.md — the target-employer list — staged for tracking.
+#
+# It is a SHAPE matcher, not a name matcher. It cannot know who is real, so it
+# refuses whole categories instead: data paths, home directories, profile URLs,
+# email addresses.
+#
+# Install: git config core.hooksPath .githooks
+# Bypass:  git commit --no-verify     (know why you're doing it)
+
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 0
+
+EMPTY_TREE=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+BASE=$(git rev-parse --verify HEAD >/dev/null 2>&1 && echo HEAD || echo "$EMPTY_TREE")
+FILES=$(git diff --cached --name-only --diff-filter=ACM "$BASE")
+[ -z "$FILES" ] && exit 0
+
+FAIL=0
+note() { printf '  %s\n' "$1"; }
+
+# --- 1. data directories: only *.example.* and README.md may be tracked ---
+BAD_PATHS=$(printf '%s\n' "$FILES" \
+  | grep -E '^(config|jobs|work-search-log|backups)/' \
+  | grep -vE '\.example\.(md|csv)$' \
+  | grep -vE '(^|/)README\.md$' || true)
+if [ -n "$BAD_PATHS" ]; then
+  echo "pre-commit: real-data paths staged —"
+  printf '%s\n' "$BAD_PATHS" | while read -r f; do note "$f"; done
+  note ""
+  note "Only *.example.* templates and README.md belong under those directories."
+  FAIL=1
+fi
+
+# --- 2. content patterns that should never be in a tracked file ---
+scan() {  # scan <label> <extended-regex>
+  local label="$1" re="$2" hits=""
+  for f in $FILES; do
+    [ -f "$f" ] || continue
+    case "$f" in .githooks/pre-commit) continue ;; esac   # this file describes the patterns
+    if git show ":$f" 2>/dev/null | grep -nEI "$re" >/dev/null 2>&1; then
+      hits="$hits $f"
+    fi
+  done
+  if [ -n "$hits" ]; then
+    echo "pre-commit: $label found in —"
+    for f in $hits; do note "$f"; done
+    FAIL=1
+  fi
+}
+
+scan "a home-directory path"  '/(home|Users)/[a-zA-Z0-9._-]+'
+scan "a LinkedIn profile URL" 'linkedin\.com/in/[A-Za-z0-9-]+'
+scan "an email address"       '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
+
+if [ "$FAIL" -ne 0 ]; then
+  echo ""
+  echo "Nothing was committed. Fix the above, or 'git commit --no-verify' if you are certain."
+  exit 1
+fi
+exit 0
