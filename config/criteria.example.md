@@ -54,6 +54,14 @@ Adjust both lines. If you want director-level roles, move Director up to Accept.
 
 This is the **soft score**, not a filter. Nothing is dropped for failing it; postings are ranked by it, and the ranking is explained to you in a sentence per posting so you can disagree with it.
 
+- `resume_path:` /path/to/your/resume.pdf
+
+Optional. If you give `/setup` a resume it drafts the "What I have done" section below from it, so you don't have to write your own career summary from scratch. `.md`, `.txt`, `.pdf` and `.docx` all work with nothing extra installed. Keeping the path here lets a later run re-read it when your resume changes.
+
+Your resume is never copied anywhere tracked — this file is gitignored, and a pre-commit hook refuses to commit anything containing a home-directory path or an email address.
+
+**A resume only answers the first of the three parts below.** It records what you did, not what you want next or what you would turn down — and people often want to stop doing the thing their resume is best at. Write those two yourself.
+
 Write this part as plain prose. Be specific about both halves — what you have done, and what you actually want. The second half is the one people skip, and it is the one that catches the postings that look right on paper and are wrong in practice.
 
 **What I have done:**

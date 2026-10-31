@@ -65,7 +65,9 @@ and type:
 /setup
 ```
 
-It interviews you for about five minutes — which state is paying your claim, the job titles you want, where you'll work, your pay floor, and what kind of work you actually want and don't want — then writes three config files. The first thing it tells you is exactly what your week will require, which most people don't know precisely.
+It interviews you for about five minutes — which state is paying your claim, the job titles you want, where you'll work, your pay floor, and what kind of work you actually want and don't want — then writes three config files.
+
+**Point it at your resume and it drafts your experience section for you** (`.md`, `.txt`, `.pdf` or `.docx`, nothing extra to install), so the slowest part of setup becomes one step. It still asks you directly what you *want* and what you'd *turn down* — a resume can't answer those, and the second one does more work than anything else in the config. The first thing it tells you is exactly what your week will require, which most people don't know precisely.
 
 **You can use this with no browser setup at all.** The most reliable source queries employers' job boards directly over plain HTTP: no login, no bot detection, nothing to install. Give `/setup` a list of ten to twenty employers you'd like to work for and you have a working tool immediately.
 

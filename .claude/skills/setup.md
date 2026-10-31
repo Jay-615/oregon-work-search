@@ -49,7 +49,42 @@ Read `config/criteria.example.md` and use it as the shape. Interview for:
 3. **Pay floor** — hourly, annual, or both. Explain two things, because both change what they see: the floor is read off the **bottom** of a disclosed range, and a range straddling the floor is kept and flagged rather than dropped.
 4. **Seniority** — which title levels to accept and which to reject.
 5. **Job types** — full-time, contract, contract-to-hire.
-6. **Experience and desires** — the soft score. Ask for three things in their own words: what they have done, what they want, and **what they do not want.**
+6. **Experience and desires** — the soft score. Three parts: what they have done, what they want, and **what they do not want.** Offer to read their resume for the first part (below) rather than making them type it out.
+
+### Offer to read their resume
+
+**Ask for a resume before interviewing them about their background.** Describing your own experience from scratch is the slowest and most off-putting part of this setup, and it is where people give up. A resume answers it in one step.
+
+> Do you have a resume handy? Give me the path and I'll draft the experience section from it — you can correct it. Or we can just talk it through.
+
+Read whatever they give you. No extra tooling is needed for any common format:
+
+| Format | How |
+|---|---|
+| `.md`, `.txt` | Read the file directly |
+| `.pdf` | Read the file directly — Claude Code reads PDFs natively. `pdftotext` is a fallback if that fails |
+| `.docx` | Not readable directly. Extract with the Python standard library — no `pandoc`, no `python-docx` |
+
+```python
+import zipfile, re, html
+def docx_text(path):
+    with zipfile.ZipFile(path) as z:
+        xml = z.read('word/document.xml').decode('utf-8', 'replace')
+    xml = re.sub(r'</w:p>', '\n', xml)          # paragraph breaks
+    xml = re.sub(r'<w:tab[^>]*/>', '\t', xml)   # tabs
+    xml = re.sub(r'<[^>]+>', '', xml)            # strip tags
+    return html.unescape(xml).strip()
+```
+
+Then draft **"What I have done"** from it — a short prose paragraph in their voice, not a bullet dump. Lead with the kind of work and the years, name the domains, and be honest about depth: "comfortable with SQL as a consumer of data, not as an engineer" is worth more to the scorer than "SQL" in a skills list, because it keeps them out of engineering roles.
+
+**Show the draft and ask them to correct it before writing the file.** It is your summary of their career and you will get emphasis wrong. Never add experience the resume does not support — this feeds a score that decides which postings they see, and an inflated version surfaces roles they cannot actually do.
+
+**A resume cannot give you the other two parts.** It records what someone did, not what they want next or what they would refuse. People frequently want to stop doing the thing their resume is best at. Ask for both directly, and never infer "what I want" from job history.
+
+Record the path as `resume_path` in `config/criteria.md` so a later run can re-read it when the resume changes.
+
+**Never copy resume content into a tracked file.** A resume carries a real name, address, phone, email and employers. `config/criteria.md` is gitignored, which is where the drafted prose belongs; the pre-commit hook blocks home-directory paths and email addresses as a backstop, so a resume path staged by accident is refused.
 
 **Push gently on the "do not want" list.** It is the highest-value part of the file and the part users skip. Explain why with the concrete case: on a documented run the best-paying posting in a batch — top of range, direct employer, clean title — was hardware new-product introduction with a team of direct reports, entirely the wrong track. Title and pay alone sent three of five picks wrong. A written "do not want" list is what catches those.
 
