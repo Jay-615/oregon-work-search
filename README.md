@@ -47,13 +47,11 @@ Two other conditions — being **able** to work and **available** for work — a
 
 ## Setup
 
-You need [Claude Code](https://claude.com/claude-code). Then:
+You need [Claude Code](https://claude.com/claude-code). Nothing else.
 
-```bash
-git config core.hooksPath .githooks
-```
+Get the files: click **Code → Download ZIP** at the top of this page and unzip it wherever you like. You don't need git or a GitHub account.
 
-That turns on a pre-commit hook that refuses to commit your own job-search data if you ever work in a clone of this repo. Everything real is gitignored already — the hook is the backstop for the case where someone adds a new kind of file and the ignore rules haven't caught up. One command, worth running.
+Then open a terminal in that folder and run:
 
 ```bash
 claude
@@ -72,6 +70,18 @@ It interviews you for about five minutes — which state is paying your claim, t
 **You can use this with no browser setup at all.** The most reliable source queries employers' job boards directly over plain HTTP: no login, no bot detection, nothing to install. Give `/setup` a list of ten to twenty employers you'd like to work for and you have a working tool immediately.
 
 **Adding LinkedIn gets you the broad sweep** — postings from employers you haven't thought of, which is most of them. That needs the Claude in Chrome extension and a logged-in LinkedIn session in your own browser. It is also the only source that can confirm a posting is still open and tell you whether it has a one-minute quick-apply route. Worth it, but not required to start.
+
+### Only if you cloned with git
+
+Downloaded the ZIP? Skip this — it will fail, because a ZIP is not a git repository.
+
+If you cloned instead, turn on the pre-commit hook:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It refuses to commit your own job-search data. Everything real is gitignored already, so this is the backstop for the case where a new kind of file appears and the ignore rules haven't caught up.
 
 ---
 
